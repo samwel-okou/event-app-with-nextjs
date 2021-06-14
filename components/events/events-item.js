@@ -1,4 +1,5 @@
 import React from "react";
+import Image from "next/image";
 
 import classes from "./event-item.module.css";
 import Button from "../ui/Button";
@@ -20,7 +21,8 @@ const EventItem = (props) => {
 
   return (
     <li className={classes.item}>
-      <img src={"/" + image} alt={title} />
+      <Image src={"/" + image} alt={title} width={300} height={300} />
+
       <div className={classes.content}>
         <div className={classes.summary}>
           <h2>{title}</h2>
