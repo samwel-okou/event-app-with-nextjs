@@ -1,14 +1,22 @@
 import classes from './newsletter-registration.module.css';
-import { useRef } from 'react';
+import { useRef, useContext } from 'react';
+import NotificationContext from '../../store/notification-context';
 
 function NewsletterRegistration() {
   const emailInputRef = useRef();
+  const notificationCtx = useContext(NotificationContext);
 
   function registrationHandler(event) {
     console.log('was clicked');
     event.preventDefault();
 
     const enteredEmail = emailInputRef.current.value;
+
+    notificationCtx.showNotification({
+      title: 'signing up...',
+      message: 'Registration for newsletter.!',
+      status: 'pending',
+    });
 
     const reqBody = { email: enteredEmail };
 
@@ -20,12 +28,33 @@ function NewsletterRegistration() {
       },
     })
       .then((response) => response.json())
-      .then((data) => console.log(data));
+      .then((data) => {
+        notificationCtx.showNotification({
+          title: 'Success',
+          message: 'Successfully registered for newsletter.!',
+          status: 'success',
+        });
+      })
+      .catch((error) => {
+        notificationCtx.showNotification({
+          title: 'error',
+          message: error.message || 'Something went wrong.!',
+          status: 'error',
+        });
+      });
   }
 
   function loadFeedbackHandler() {
     fetch('/api/newsletter')
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        response.json().then((data) => {
+          throw new error(data.message || 'Something went wrong.!');
+        });
+      })
       .then((data) => {
         setFeedbackItems(data.feedback);
       });
