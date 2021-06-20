@@ -27,7 +27,15 @@ function NewsletterRegistration() {
         'Content-Type': 'application/json',
       },
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        return response.json().then((data) => {
+          throw new error(data.message || 'Something went wrong.!');
+        });
+      })
       .then((data) => {
         notificationCtx.showNotification({
           title: 'Success',
@@ -44,26 +52,6 @@ function NewsletterRegistration() {
       });
   }
 
-  function loadFeedbackHandler() {
-    fetch('/api/newsletter')
-      .then((response) => {
-        if (response.ok) {
-          return response.json();
-        }
-
-        response.json().then((data) => {
-          throw new error(data.message || 'Something went wrong.!');
-        });
-      })
-      .then((data) => {
-        setFeedbackItems(data.feedback);
-      });
-
-    // fetch user input (state or refs)
-    // optional: validate input
-    // send valid data to API
-  }
-
   return (
     <section className={classes.newsletter}>
       <h2>Sign up to stay updated!</h2>
@@ -76,10 +64,7 @@ function NewsletterRegistration() {
             aria-label="Your email"
             ref={emailInputRef}
           />
-          <button onClick={loadFeedbackHandler}>Register</button>
-          {/* {feedbackItems.map((item) => (
-            <li key={item.id}>{item.email}</li>
-          ))} */}
+          <button>Register</button>
         </div>
       </form>
     </section>
